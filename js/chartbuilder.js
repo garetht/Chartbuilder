@@ -845,7 +845,7 @@ ChartBuilder.start = function(config) {
 
 	$("#createImageButton").click(function() {
 		var stylesheetFile = $("#stylesheet-file").val();
-		$("downloadLinksDiv").hide();
+		$("#downloadLinksDiv").hide();
 		ChartBuilder.inlineAllStyles(stylesheetFile);
 		ChartBuilder.createChartImage();
 		$("#downloadLinksDiv").fadeIn('fast');
