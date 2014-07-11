@@ -12,12 +12,12 @@
 
 		<!-- favicon updates through js -->
 		<link id="favicon" rel="shortcut icon" type="image/png" href="" />
-		
+
 		<!-- Libraries CSS -->
 		<link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css" type="text/css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css" type="text/css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="bower_components/really-simple-color-picker/colorPicker.css" type="text/css" media="screen" charset="utf-8">
-		
+
 		<!-- Chartbuilder CSS -->
 		<link rel="stylesheet" href="css/chartbuilder.css" type="text/css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="css/gneisschart.css" type="text/css" media="screen" charset="utf-8">
@@ -30,9 +30,9 @@
 			  <div class="cbInner">
   				<div id="staticContainer">
   					<div id="chartContainer"></div>
-  
-  					<canvas id="canvas" width="1200px" height="676px"></canvas> 
-  					<canvas id="favicanvas" width="16px" height="16px"></canvas> 
+
+  					<canvas id="canvas" width="1200px" height="676px"></canvas>
+  					<canvas id="favicanvas" width="16px" height="16px"></canvas>
   				</div>
 			  </div>
       </div>
@@ -40,7 +40,7 @@
 			<div id="rightColumn" class="column">
 			  <div class="cbInner">
 			    <h1>ChartBuilder</h1>
-			  
+
   				<div id="chartOptions" class="interfaceCol">
              <div id="datainput">
              	<div class="inputGroup">
@@ -64,7 +64,7 @@
               <h2>2. Series Options</h2>
               <div id="seriesItems"></div>
             </div>
-  					
+
   					<div class="optionBlock">
     					<h2>3. Chart Options</h2>
     						<div class="optionGroup"><label for="chart_title">Title</label><input type="text" name="chart_title" value="" id="chart_title"></div>
@@ -143,18 +143,19 @@
             </div>
             <div class="optionBlock full">
               <h2>4. Export</h2>
+              <input type="text" id="stylesheet-file">
               <div class="updateButton" id="createImageButton">
                 <p>Create Image of Chart</p>
               </div>
               <div id="downloadLinksDiv" class="downloadLinks hide">
-                <a download="new_chart.png" id="downloadImageLink" class="downloadLink" href="#" target="_blank">Download&nbsp;Image&nbsp;of&nbsp;Chart</a> or 
+                <a download="new_chart.png" id="downloadImageLink" class="downloadLink" href="#" target="_blank">Download&nbsp;Image&nbsp;of&nbsp;Chart</a> or
                 <a download="new_chart.svg" id="downloadSVGLink" class="downloadLink" href="#" target="_blank">Download&nbsp;SVG&nbsp;of&nbsp;Chart</a>
               </div>
             </div>
             <div class="optionBlock full">
               <h4>5. Copy the HTML table of your data (if you want)</h4>
               <textarea  class="input-box"  id="table-html" type="text" rows="10"></textarea>
-              
+
               <div class="previousCharts hide">
                 <div class="optionGroup"><label for="previous_charts">Previously Created Charts</label>
                   <select name="previous_charts" id="previous_charts"></select>
@@ -163,9 +164,9 @@
             </div>
             <div class="clearfix"></div>
   				</div>
-  				
+
           <div id="currentSeries" class="interfaceCol"></div>
-  			</div>			
+  			</div>
 			</div>
       <div id="blankColumn" class="column"></div>
       <div class="clearfix"></div>
@@ -181,11 +182,11 @@
 		<script src="bower_components/really-simple-color-picker/jquery.colorPicker.min.js" charset="utf-8"></script>
 		<script src="bower_components/webfontloader/target/webfont.js" type="text/javascript" charset="utf-8"></script>
 		<script src="bower_components/sugar/release/sugar.min.js" charset="utf-8"></script>
-		
+
 		<!-- Chartbuilder JS -->
 		<script src="js/gneisschart.js" charset="utf-8"></script>
 		<script src="js/chartbuilder.js"></script>
-		
+
 		<script type="text/javascript">
 
 		//This loads the webfonts and starts Chartbuilder once they're present
