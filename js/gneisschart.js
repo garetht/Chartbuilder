@@ -1008,7 +1008,8 @@ function Gneiss(config)
 
 					//store the line element of the axisItem
 					axisItem.line = d3.select(this).select("line")
-						.attr("stroke","#E6E6E6");
+						.attr("stroke","#d5d9dc")
+						.style("stroke-dasharray", "8, 4");
 
 
 					//apply the prefix as appropriate
