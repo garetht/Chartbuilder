@@ -25,6 +25,10 @@ Gneiss.defaultGneissChartConfig = {
 	editable: true, // reserved for enabling or dissabling on chart editing
 	lineDotsThreshold: 15, //line charts will have dots on points until a series has this number of points
 	dotRadius: 4, //the radius of dots used on line and scatter plots
+	dotStructure: function(group) {
+		group.append("circle")
+				 .attr("r", this.dotRadius())
+	},
 	bargridLabelMargin: 4, //the horizontal space between a bargrid bar and it's label
 	bargridBarThickness: 20, //thickness of the bars in a bargrid
 	xAxisMargin: 8, //the vertical space between the plot area and the x axis
@@ -287,6 +291,7 @@ function Gneiss(config)
 
 	var lineDotsThreshold;
 	var dotRadius;
+	var dotStructure;
 	var bargridLabelMargin;
 	var bargridBarThickness;
 	var xAxisMargin;
@@ -496,6 +501,13 @@ function Gneiss(config)
 			dotRadius = n;
 	};
 
+	this.dotStructure = function Gneiss$dotStructure(n) {
+		if (!arguments.length) {
+			return dotStructure;
+		}
+			dotStructure = n;
+	};
+
 	this.bargridLabelMargin = function Gneiss$bargridLabelMargin(n) {
 		if (!arguments.length) {
 			return bargridLabelMargin;
@@ -631,6 +643,7 @@ function Gneiss(config)
 		g.padding($.extend(true, {}, config.padding));
 		g.lineDotsThreshold(config.lineDotsThreshold *1);
 		g.dotRadius(config.dotRadius *1);
+		g.dotStructure(config.dotStructure);
 		g.bargridLabelMargin(config.bargridLabelMargin *1);
 		g.bargridBarThickness(config.bargridBarThickness *1);
 		g.xAxisMargin(config.xAxisMargin * 1);
@@ -1560,11 +1573,8 @@ function Gneiss(config)
 								g.xAxis().scale(i)) + "," + g.yAxis()[yAxisIndex].scale(d) + ")"
 							})
 
-				lineSeriesDotGroupsContainer.append("circle")
-						.attr("r",g.dotRadius())
-				lineSeriesDotGroupsContainer.append("circle")
-						.attr("r",g.dotRadius() - 2)
-
+				var setDotStructure = g.dotStructure().bind(g)
+				setDotStructure(lineSeriesDotGroupsContainer);
 
 				//add scatter to chart
 				scatterGroups = scatterSeries.data(sbt.scatter)
@@ -1836,18 +1846,13 @@ function Gneiss(config)
 					.remove()
 
 
-				var lineSeriesDotsContainer = lineSeriesDots.enter()
+				lineSeriesDots.enter()
 											.append("g")
 											.attr("transform",function(d,i){
 												yAxisIndex = d3.select(this.parentNode).data()[0].axis;
 													var y = d || d ===0 ? g.yAxis()[yAxisIndex].scale(d) : -100;
 													return "translate("+ g.xAxis().scale(g.xAxisRef()[0].data[i]) + "," + y + ")";
 												})
-
-				lineSeriesDotsContainer.append("circle")
-					.attr("r",g.dotRadius())
-				lineSeriesDotsContainer.append("circle")
-					.attr("r",g.dotRadius() - 2)
 
 				lineSeriesDots.transition()
 					.duration(500)
