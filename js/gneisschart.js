@@ -1019,11 +1019,16 @@ function Gneiss(config)
 					//store the text element of the axisItem
 					axisItem.text = d3.select(this).select("text");
 
+					var groups = axisGroup.selectAll("g").length - 1;
 					//store the line element of the axisItem
 					axisItem.line = d3.select(this).select("line")
 						.attr("stroke","#d5d9dc")
-						.style("stroke-dasharray", "8, 4");
-
+						.style("stroke-dasharray", function(datum) {
+							return j === groups ? "" : "8, 4";
+						})
+						.style("stroke-width", function(datum) {
+							return j === groups ? "2px" : "1px";
+						});
 
 					//apply the prefix as appropriate
 					switch(curAxis.prefix.use) {
