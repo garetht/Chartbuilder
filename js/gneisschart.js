@@ -1845,14 +1845,16 @@ function Gneiss(config)
 				lineSeriesDotGroups.filter(function(d){return d.data.length >= g.lineDotsThreshold()})
 					.remove()
 
-
-				lineSeriesDots.enter()
+				var lineSeriesDotsContainer = lineSeriesDots.enter()
 											.append("g")
 											.attr("transform",function(d,i){
 												yAxisIndex = d3.select(this.parentNode).data()[0].axis;
 													var y = d || d ===0 ? g.yAxis()[yAxisIndex].scale(d) : -100;
 													return "translate("+ g.xAxis().scale(g.xAxisRef()[0].data[i]) + "," + y + ")";
 												})
+
+				var updateDotStructure = g.dotStructure().bind(g)
+				updateDotStructure(lineSeriesDotsContainer);
 
 				lineSeriesDots.transition()
 					.duration(500)
