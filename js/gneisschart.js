@@ -1547,19 +1547,23 @@ function Gneiss(config)
 					.attr("class","lineSeriesDots seriesGroup")
 					.attr("fill", function(d,i){return d.color? d.color : colors[i]})
 
-				lineSeriesDotGroups
+				var lineSeriesDotGroupsContainer = lineSeriesDotGroups
 					.filter(function(d){return d.data.length < g.lineDotsThreshold()})
-					.selectAll("circle")
+					.selectAll("g")
 					.data(function(d){ return d.data})
 					.enter()
-						.append("circle")
-						.attr("r",g.dotRadius())
+					.append("g")
 						.attr("transform",function(d,i){
 							yAxisIndex = d3.select(this.parentNode).data()[0].axis;
 							return "translate("+(g.xAxis().type=="date" ?
 								g.xAxis().scale(g.xAxisRef()[0].data[i]):
 								g.xAxis().scale(i)) + "," + g.yAxis()[yAxisIndex].scale(d) + ")"
 							})
+
+				lineSeriesDotGroupsContainer.append("circle")
+						.attr("r",g.dotRadius())
+				lineSeriesDotGroupsContainer.append("circle")
+						.attr("r",g.dotRadius() - 2)
 
 
 				//add scatter to chart
@@ -1825,21 +1829,25 @@ function Gneiss(config)
 				lineSeriesDotGroups.exit().remove()
 
 				lineSeriesDots = lineSeriesDotGroups.filter(function(d){return d.data.length < g.lineDotsThreshold()})
-					.selectAll("circle")
+					.selectAll("g")
 					.data(function(d,i){return d.data})
 
 				lineSeriesDotGroups.filter(function(d){return d.data.length >= g.lineDotsThreshold()})
 					.remove()
 
 
-				lineSeriesDots.enter()
-					.append("circle")
+				var lineSeriesDotsContainer = lineSeriesDots.enter()
+											.append("g")
+											.attr("transform",function(d,i){
+												yAxisIndex = d3.select(this.parentNode).data()[0].axis;
+													var y = d || d ===0 ? g.yAxis()[yAxisIndex].scale(d) : -100;
+													return "translate("+ g.xAxis().scale(g.xAxisRef()[0].data[i]) + "," + y + ")";
+												})
+
+				lineSeriesDotsContainer.append("circle")
 					.attr("r",g.dotRadius())
-					.attr("transform",function(d,i){
-						yAxisIndex = d3.select(this.parentNode).data()[0].axis;
-							var y = d || d ===0 ? g.yAxis()[yAxisIndex].scale(d) : -100;
-							return "translate("+ g.xAxis().scale(g.xAxisRef()[0].data[i]) + "," + y + ")";
-						})
+				lineSeriesDotsContainer.append("circle")
+					.attr("r",g.dotRadius() - 2)
 
 				lineSeriesDots.transition()
 					.duration(500)
