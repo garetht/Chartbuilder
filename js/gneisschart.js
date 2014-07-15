@@ -1023,12 +1023,6 @@ function Gneiss(config)
 					//store the line element of the axisItem
 					axisItem.line = d3.select(this).select("line")
 						.attr("stroke","#d5d9dc")
-						.style("stroke-dasharray", function(datum) {
-							return j === groups ? "" : "8, 4";
-						})
-						.style("stroke-width", function(datum) {
-							return j === groups ? "2px" : "1px";
-						});
 
 					//apply the prefix as appropriate
 					switch(curAxis.prefix.use) {
