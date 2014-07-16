@@ -779,7 +779,7 @@ ChartBuilder = {
 // Create default config for chartbuilder
 ChartBuilder.getDefaultConfig = function() {
   var chartConfig = {};
-  chartConfig.colors = ["#BF0053","#FF70B0","#E15D98","#C44B81","#A63869","#882551","#6B133A","#4D0022",
+  chartConfig.colors = ["#0066C3","#FF70B0","#E15D98","#C44B81","#A63869","#882551","#6B133A","#4D0022",
 						"#BF600A","#FFC07E","#E1A76A","#C48D55","#A67341","#885A2D","#6B4118","#4D2704",
 						"#BFAA00","#FFF270","#E1D55D","#C4B84B","#A69C38","#887F25","#6B6213","#4D4500",
 						"#00BFA5","#70FFF7","#5DE1D9","#4BC4BC","#38A69E","#258880","#136B63","#004D45",
@@ -941,7 +941,7 @@ ChartBuilder.start = function(config) {
 			if(!chart.isBargrid()) {
 				if(chart.series().length === 1 && chart.title().length === 0 || chart.title() === chart.series()[0].name) {
 					chart.title(chart.series()[0].name);
-					chart.titleElement().text(chart.title());
+					chart.headerElement().select(".header-title").text(chart.title());
 					$("#chart_title").val(chart.title());
 				}
 			}
@@ -1064,7 +1064,7 @@ ChartBuilder.start = function(config) {
 			.redraw();
 		ChartBuilder.makeLegendAdjustable();
 
-		chart.titleElement().text(chart.title());
+		chart.headerElement().select(".header-title").text(chart.title());
 	});
 
 	$(".downloadLink").click(function() {

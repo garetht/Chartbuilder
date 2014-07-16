@@ -43,6 +43,13 @@ Gneiss.defaultGneissChartConfig = {
 	legend: true, // whether or not there should be a legend
 	title: "", // the chart title
 	titleBottomMargin: 5, // the vertical space between the title and the next element (sometimes a legend, sometimes an axis)
+	headerStructure: function(headerGroup) {
+		headerGroup.append("text")
+							 .attr("y", this.padding().top / 2)
+							 .attr("x", this.padding().left + 130)
+							 .attr("id","titleLine")
+							 .text("Placeholder");
+	},
 	bargridLabelBottomMargin: 5, //the space between the bargrid series label and the top most bar
 	colors: ["#ff4cf4","#ffb3ff","#e69ce6","#cc87cc","#b373b3","#995f99","#804c80","#665266","#158eff","#99cdff","#9cc2e6","#87abcc","#7394b3","#5f7d99","#466780","#525c66"],
 	padding :{
@@ -260,6 +267,7 @@ function Gneiss(config)
 	var containerElement;
 	var chartElement;
 	var titleElement;
+	var headerElement;
 	var footerElement;
 	var sourceElement;
 	var creditElement;
@@ -392,6 +400,13 @@ function Gneiss(config)
 			return titleElement;
 		}
 		titleElement = elem;
+	};
+
+	this.headerElement = function Gneiss$headerElement(elem) {
+		if (!arguments.length) {
+			return headerElement;
+		}
+		headerElement = elem;
 	};
 
 	this.source = function Gneiss$sourceLineText(s) {
@@ -571,6 +586,14 @@ function Gneiss(config)
 		titleBottomMargin = n;
 	};
 
+	this.headerStructure = function Gneiss$headerStructure(n) {
+		if (!arguments.length) {
+			return headerStructure;
+		}
+
+		headerStructure = n;
+	};
+
 	this.bargridLabelBottomMargin = function Gneiss$bargridLabelBottomMargin(n) {
 		if (!arguments.length) {
 			return bargridLabelBottomMargin;
@@ -646,6 +669,7 @@ function Gneiss(config)
 		g.columnGap(config.columnGap * 1);
 		g.maxColumnWidth(config.maxColumnWidth * 1);
 		g.titleBottomMargin(config.titleBottomMargin * 1);
+		g.headerStructure(config.headerStructure);
 		g.bargridLabelBottomMargin(config.bargridLabelBottomMargin *1);
 		g.axisBarGap(config.axisBarGap * 1);
 		g.allowAxisOverlap(config.allowAxisOverlap);
@@ -677,11 +701,20 @@ function Gneiss(config)
 		g.seriesByType(this.splitSeriesByType(g.series()));
 		this.updateGraphPropertiesBasedOnSeriesType(g, g.seriesByType());
 
+		// Set up the title area
 		g.titleElement(g.chartElement().append("text")
-			.attr("y",18)
-			.attr("x", g.padding().left)
+			.attr("y", 0)
+			.attr("x", g.padding().left + 130)
 			.attr("id","titleLine")
-			.text(g.title()));
+			.text(""));
+
+		var headerGroup = g.chartElement().append("g")
+											 .attr("y", g.padding().top / 2)
+											 .attr("x", g.padding().left)
+
+		var headerStruct = g.headerStructure().bind(g);
+		headerStruct(headerGroup);
+		g.headerElement(headerGroup);
 
 		this.calculateColumnWidths()
 			.setYScales()
@@ -976,6 +1009,7 @@ function Gneiss(config)
 					.attr("id",i == 0 ? "leftAxis" : "rightAxis" )
 					.attr("transform",i == 0 ? "translate("+( g.width()-g.padding().right)+",0)" : "translate("+g.padding().left+",0)" )
 					.call(curAxis.axis);
+
 			}
 			else {
 				curAxis.axis//.ticks(`)[0].ticks) // I'm not using built in ticks because it is too opinionated
@@ -1013,6 +1047,7 @@ function Gneiss(config)
 
 					var groups = axisGroup.selectAll("g").length - 1;
 					//store the line element of the axisItem
+
 					axisItem.line = d3.select(this).select("line")
 						.attr("stroke","#D5D9DC")
 						// former dasharray
@@ -1069,6 +1104,12 @@ function Gneiss(config)
 						break;
 					}
 
+					// Some shifting
+					axisItem.text
+									.attr("class", "label-text")
+									.attr("transform", "translate(-10, 8)")
+									.attr("")
+
 					//find the top most axisItem
 					//store its text element
 					if(axisItem.y < minY) {
@@ -1116,12 +1157,12 @@ function Gneiss(config)
 				//only the prefix should be added (Because the suffix is already there)
 				topAxisLabel.text(g.yAxis()[i].prefix.value + topAxisLabel.text());
 			}
-
 		}
 
 		try{
 			//the title will always be the same distance from the top, and will always be the top most element
-			g.titleElement().attr("y",g.defaultPadding().top + g.titleElement()[0][0].getBoundingClientRect().height);
+			// Our title element is independent of the graph, and is placed in the padding
+			g.titleElement().attr("y",g.defaultPadding().top / 2 - 20);
 		}catch(e){/* There isn't a title element and I dont care to let you know */}
 
 		if(g.isBargrid()){
@@ -1180,7 +1221,7 @@ function Gneiss(config)
 				.scale(g.xAxis().scale)
 				.orient(g.isBargrid() ? "left" : "bottom")
 				.tickFormat(g.xAxis().formatter ? Gneiss.dateParsers[g.xAxis().formatter] : function(d) {return d;})
-				.ticks(g.xAxis().ticks);
+				.ticks(g.xAxis().ticks)
 
 				if(g.xAxis().type == "date") {
 					if(g.xAxis().ticks === null || !isNaN(g.xAxis().ticks)) {
@@ -1387,6 +1428,9 @@ function Gneiss(config)
 			g.chartElement().selectAll("#xAxis")
 				.attr("transform",g.isBargrid() ? "translate(" + g.padding().left + ",0)" : "translate(0," + (g.height() - g.padding().bottom + g.xAxisMargin()) + ")")
 				.call(g.xAxis().axis);
+
+			d3.selectAll('#xAxis .tick')
+				.attr("transform", "translate(0, -8)");
 		}
 
 		g.chartElement().selectAll("#xAxis text")
@@ -1536,7 +1580,6 @@ function Gneiss(config)
 							return g.xAxis().scale(g.xAxisRef()[0].data[i])  - columnWidth/2
 							})
 						.attr("y",function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)})
-
 
 				//add lines to chart
 				lineSeries.data(sbt.line)
