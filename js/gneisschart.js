@@ -50,6 +50,7 @@ Gneiss.defaultGneissChartConfig = {
 							 .attr("id","titleLine")
 							 .text("Placeholder");
 	},
+	secondaryTitle: "2011-2031",
 	bargridLabelBottomMargin: 5, //the space between the bargrid series label and the top most bar
 	colors: ["#ff4cf4","#ffb3ff","#e69ce6","#cc87cc","#b373b3","#995f99","#804c80","#665266","#158eff","#99cdff","#9cc2e6","#87abcc","#7394b3","#5f7d99","#466780","#525c66"],
 	padding :{
@@ -101,7 +102,7 @@ Gneiss.defaultGneissChartConfig = {
 		}
 	],
 	sourceline: "",
-	creditline: "Made with Chartbuilder"
+	creditline: "Made with love by SeatGeek"
 };
 
 Gneiss.dateParsers = {
@@ -395,6 +396,20 @@ function Gneiss(config)
 		title = t;
 	};
 
+	this.subtitle = function Gneiss$subtitle(t) {
+		if (!arguments.length) {
+			return subtitle;
+		}
+		subtitle = t;
+	};
+
+	this.secondaryTitle = function Gneiss$secondaryTitle(t) {
+		if (!arguments.length) {
+			return secondaryTitle;
+		}
+		secondaryTitle = t;
+	};
+
 	this.titleElement = function Gneiss$titleElement(elem) {
 		if (!arguments.length) {
 			return titleElement;
@@ -646,6 +661,8 @@ function Gneiss(config)
 		g.containerId(config.container.slice());
 		g.containerElement( $(g.containerId() ));
 		g.title(config.title.slice());
+		g.subtitle(config.subtitle.slice());
+		g.secondaryTitle(config.secondaryTitle.slice());
 		g.source(config.sourceline.slice());
 		g.credit(config.creditline.slice());
 		g.legend(config.legend === true ? true : false);

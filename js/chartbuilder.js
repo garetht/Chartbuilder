@@ -785,7 +785,7 @@ ChartBuilder.getDefaultConfig = function() {
 						"#00BFA5","#70FFF7","#5DE1D9","#4BC4BC","#38A69E","#258880","#136B63","#004D45",
 						"#006DBF","#70B8FF","#5DA1E1","#4B89C4","#3871A6","#255A88","#13436B","#002B4D",
 						"#9300BF","#E770FF","#CB5DE1","#AE4BC4","#9238A6","#752588","#59136B","#3C004D"];
-  chartConfig.creditline = "Made with Chartbuilder";
+  chartConfig.creditline = "Made with love by SeatGeek.";
 
   return chartConfig;
 };
@@ -1037,7 +1037,6 @@ ChartBuilder.start = function(config) {
 			$("#x_axis_tick_date_frequency").removeAttr("disabled");
 		}
 
-
 		ChartBuilder.redraw();
 		ChartBuilder.inlineAllStyles();
 	});
@@ -1064,7 +1063,28 @@ ChartBuilder.start = function(config) {
 			.redraw();
 		ChartBuilder.makeLegendAdjustable();
 
-		chart.headerElement().select(".header-title").text(chart.title());
+		var headerTitle = chart.headerElement().select(".header-title"),
+							title = headerTitle[0][0];
+		headerTitle.text(chart.title());
+		chart.headerElement().select(".header-secondary-title-background")
+												 .attr("x", title.offsetLeft + title.clientWidth + 5);
+		chart.headerElement().select(".header-secondary-title")
+												 .attr("x", title.offsetLeft + title.clientWidth + 5 + 11);
+	});
+
+	$("#chart_subtitle").keyup(function() {
+		var val = $(this).val();
+		chart.subtitle(val);
+		chart.headerElement().select(".header-subtitle").text(chart.subtitle());
+	});
+
+	$("#chart_secondary_title").keyup(function() {
+		var val = $(this).val();
+		chart.secondaryTitle(val);
+		var secText = chart.headerElement().select(".header-secondary-title");
+		secText.text(chart.secondaryTitle());
+		chart.headerElement().select(".header-secondary-title-background")
+												 .attr("width", secText[0][0].innerHTML.length > 0 ?  secText[0][0].clientWidth + 23 : 0);
 	});
 
 	$(".downloadLink").click(function() {
