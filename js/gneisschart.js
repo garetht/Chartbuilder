@@ -985,9 +985,26 @@ function Gneiss(config)
 				g.yAxis()[i].line = d3.svg.line();
 			}
 
-			g.yAxis()[i].line.y(function(d,j){ return d || d === 0 ? g.yAxis()[yAxisIndex].scale(d) : null });
-			g.yAxis()[i].line.x(function(d,j){ return d || d === 0 ? g.xAxis().scale(g.xAxisRef()[0].data[j]) : null });
+			if (!g.yAxis()[i].area) {
+				g.yAxis()[i].area = d3.svg.area();
+			}
+			g.yAxis()[i].line.y(function(d,j) {
+				return d || d === 0 ? g.yAxis()[yAxisIndex].scale(d) : null
+			});
+			g.yAxis()[i].line.x(function(d,j) {
+				return d || d === 0 ? g.xAxis().scale(g.xAxisRef()[0].data[j]) : null
+			});
 
+			g.yAxis()[i].area
+			.y0(function() {
+				return 500;
+			})
+			.y1(function(d, j) {
+				return d || d === 0 ? g.yAxis()[yAxisIndex].scale(d) : null;
+			})
+			.x(function(d, j) {
+				return d || d === 0 ? g.xAxis().scale(g.xAxisRef()[0].data[j]) : null;
+			});
 		}
 		return this;
 	};
@@ -1568,7 +1585,7 @@ function Gneiss(config)
 			g.seriesContainer = g.chartElement().append("g")
 				.attr("id","seriesContainer");
 
-			lineSeries = g.seriesContainer.selectAll("path");
+			lineSeries = g.seriesContainer.selectAll("path.seriesLine");
 			columnSeries = g.seriesContainer.selectAll("g.seriesColumn");
 			var columnGroups;
 			var columnRects;
@@ -1598,13 +1615,24 @@ function Gneiss(config)
 							})
 						.attr("y",function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)})
 
-				//add lines to chart
-				lineSeries.data(sbt.line)
-					.enter()
+				var lsd = lineSeries.data(sbt.line)
+				lsd.enter()
 					.append("path")
-						.attr("d",function(d,j) { yAxisIndex = d.axis; pathString = g.yAxis()[d.axis].line(d.data).split("L0,0").join("M").split("L0,0").join("");  return pathString.indexOf("NaN")==-1?pathString:"M0,0"})
+						.attr("d",function(d,j) {
+							yAxisIndex = d.axis;
+							pathString = g.yAxis()[d.axis].line(d.data).split("L0,0").join("M").split("L0,0").join("");
+							return pathString.indexOf("NaN")==-1?pathString:"M0,0"
+						})
 						.attr("class","seriesLine seriesGroup")
 						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
+
+				lsd.enter()
+					 .append("path")
+					 .attr("class", "graph-area")
+					 .attr("d", function(d, j) {
+					 		var pathString = g.yAxis()[d.axis].area(d.data);
+					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0"
+					 })
 
 				lineSeriesDotGroups = lineSeriesDots.data(sbt.line)
 					.enter()
@@ -1856,22 +1884,34 @@ function Gneiss(config)
 				columnRects.exit().remove()
 
 				//add lines
-				lineSeries = g.seriesContainer.selectAll("path")
+				lineSeries = g.seriesContainer.selectAll("path.seriesLine")
 					.data(sbt.line)
 					.attr("stroke",function(d,i){return d.color? d.color : colors[i]});
 
 				lineSeries.enter()
-					.append("path")
+						.append("path")
 						.attr("d",function(d,j) { yAxisIndex = d.axis; pathString = g.yAxis()[d.axis].line(d.data).split("L0,0L").join("M0,0M").split("L0,0").join(""); return pathString;})
 						.attr("class","seriesLine")
 						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
+
+				var lineArea = g.seriesContainer.selectAll("path.main-path")
+					 							.data(sbt.line)
+
+				lineArea
+					 .enter()
+					 .append("path")
+					 .attr("class", "graph-area")
+					 .attr("d", function(d, j) {
+					 		var pathString = g.yAxis()[d.axis].area(d.data);
+					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0"
+					 })
 
 				lineSeries.transition()
 					.duration(500)
 					.attr("d",function(d,j) { yAxisIndex = d.axis; pathString = g.yAxis()[d.axis].line(d.data).split("L0,0L").join("M0,0M").split("L0,0").join(""); return pathString;})
 
 				lineSeries.exit().remove()
-
+				lineArea.exit().remove()
 
 				//Add dots to the appropriate line series
 				lineSeriesDotGroups = g.seriesContainer.selectAll("g.lineSeriesDots")
