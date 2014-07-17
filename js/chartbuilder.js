@@ -68,6 +68,10 @@ ChartBuilder = {
 		if(rows_num < 2) {
 			return null;
 		}
+
+		return {
+			data: csv_matrix
+		};
 	},
 	getNewData: function(csv) {
 		var i;
@@ -76,7 +80,7 @@ ChartBuilder = {
 		}
 
 		var parser = window.Papa && window.Papa.parse ? Papa.parse : this.parser;
-		return parser(csv);
+		return parser(csv).data;
 	},
 	// Given the matrix containing the well formated csv, create the object that
 	// is going to be used later
