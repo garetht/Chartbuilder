@@ -707,13 +707,12 @@ function Gneiss(config)
 		g.legendLabelSpacingY(config.legendLabelSpacingY * 1);
 		g.columnGap(config.columnGap * 1);
 		g.maxColumnWidth(config.maxColumnWidth * 1);
+		g.columnLeftPadding(config.columnLeftPadding);
 		g.titleBottomMargin(config.titleBottomMargin * 1);
 		g.headerStructure(config.headerStructure);
 		g.bargridLabelBottomMargin(config.bargridLabelBottomMargin *1);
 		g.axisBarGap(config.axisBarGap * 1);
 		g.allowAxisOverlap(config.allowAxisOverlap);
-
-
 
 		//append svg to container using svg
 		g.chartElement(d3.select(g.containerId()).append("svg")
@@ -1114,10 +1113,10 @@ function Gneiss(config)
 
 					var groups = axisGroup.selectAll("g").length - 1;
 					//store the line element of the axisItem
-
+					console.log()
 					axisItem.line = d3.select(this).select("line")
 						.attr("x2", -620)
-						.attr("x1", -17)
+						.attr("x1", -11 + g.columnLeftPadding())
 						.attr("stroke","#D5D9DC")
 						//former dasharray
 
@@ -1176,7 +1175,7 @@ function Gneiss(config)
 					// Some shifting
 					axisItem.text
 									.attr("class", "label-text")
-									.attr("transform", "translate(-10, 1)")
+									.attr("transform", "translate(-13, 1)")
 
 					//find the top most axisItem
 					//store its text element
@@ -1384,7 +1383,7 @@ function Gneiss(config)
 			g.chartElement().append("g")
 				.attr("class",'axis')
 				.attr("id","xAxis")
-				.attr("transform",g.isBargrid() ? "translate(" + g.padding().left + ",0)" : "translate(0," + (g.height() - g.padding().bottom + g.xAxisMargin()) + ")")
+				.attr("transform",g.isBargrid() ? "translate(" + g.padding().left + ",0)" : "translate(" + g.columnLeftPadding() + "," + (g.height() - g.padding().bottom + g.xAxisMargin()) + ")")
 				.call(g.xAxis().axis);
 		}
 		else {
@@ -1494,7 +1493,7 @@ function Gneiss(config)
 			}
 
 			g.chartElement().selectAll("#xAxis")
-				.attr("transform",g.isBargrid() ? "translate(" + g.padding().left + ",0)" : "translate(0," + (g.height() - g.padding().bottom + g.xAxisMargin()) + ")")
+				.attr("transform",g.isBargrid() ? "translate(" + g.padding().left + ",0)" : "translate(" + g.columnLeftPadding() + "," + (g.height() - g.padding().bottom + g.xAxisMargin()) + ")")
 				.call(g.xAxis().axis);
 
 			d3.selectAll('#xAxis .tick')
@@ -1583,7 +1582,6 @@ function Gneiss(config)
 		g.columnWidth(columnWidth);
 		g.columnGroupWidth((columnWidth + g.columnGap()) * numColumnSeries);
 		g.columnGroupShift(columnWidth + g.columnGap());
-		g.columnLeftPadding(config.columnLeftPadding);
 
 		return this;
 	};
@@ -1619,7 +1617,8 @@ function Gneiss(config)
 
 			//create a group to contain series
 			g.seriesContainer = g.chartElement().append("g")
-				.attr("id","seriesContainer");
+				.attr("id","seriesContainer")
+				.attr("transform", "translate(" + g.columnLeftPadding() + ",0)");
 
 			lineSeries = g.seriesContainer.selectAll("path.seriesLine");
 			columnSeries = g.seriesContainer.selectAll("g.seriesColumn");
@@ -1638,7 +1637,14 @@ function Gneiss(config)
 					.append("g")
 						.attr("class","seriesColumn seriesGroup")
 						.attr("fill",function(d,i){return d.color? d.color : colors[i+sbt.line.length]})
-						.attr("transform",function(d,i){return "translate("+(i*columnGroupShift - (columnGroupShift * (sbt.column.length-1)/2) + columnLeftPadding)+",0)"})
+						.attr("transform",function(d,i){return "translate("+(i*columnGroupShift - (columnGroupShift * (sbt.column.length-1)/2))+",0)"})
+
+				// var barIterator = columnGroups.selectAll("g")
+				// 															.data(function(d, i) {
+				// 																return d.data;
+				// 															})
+				// 															.enter();
+				// var barStruct = g.barStructure().bind(g);
 
 				columnGroups.selectAll("rect")
 					.data(function(d,i){return d.data})
@@ -1665,12 +1671,14 @@ function Gneiss(config)
 				lineSeriesData.enter()
 					 .append("path")
 					 .attr("class", function(d, i) {
-					 	console.log(d, i)
 					 		return "graph-area";
 					 })
 					 .attr("d", function(d, j) {
 					 		var pathString = g.yAxis()[d.axis].area(d.data);
 					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0"
+					 })
+					 .attr("fill", function(d, j) {
+					 	return "url(" + (d.color ? d.color : colors[j]) + "-gradient)";
 					 })
 
 				lineSeriesDotGroups = lineSeriesDots.data(sbt.line)
@@ -1940,12 +1948,14 @@ function Gneiss(config)
 					 .enter()
 					 .append("path")
 					 .attr("class", function(d, i) {
-					 	console.log(d, i)
 					 	return "graph-area";
 					 })
 					 .attr("d", function(d, j) {
 					 		var pathString = g.yAxis()[d.axis].area(d.data);
 					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0";
+					 })
+					 .attr("fill", function(d, j) {
+					 	 return "url(" + (d.color ? d.color : colors[j]) + "-gradient)";
 					 })
 
 				lineSeries.transition()
@@ -1966,6 +1976,7 @@ function Gneiss(config)
 				lineSeriesDotGroups = g.seriesContainer.selectAll("g.lineSeriesDots")
 					.data(sbt.line)
 					.attr("fill",function(d,i){return d.color? d.color : colors[i]})
+					.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
 
 				lineSeriesDotGroups
 					.enter()
