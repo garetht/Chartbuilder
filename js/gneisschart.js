@@ -39,6 +39,7 @@ Gneiss.defaultGneissChartConfig = {
 	legendLabelSpacingX: 5, //the horizontal space between legend items
 	legendLabelSpacingY: 4, //the vertical space between legend items
 	columnGap: 1, //the horizontal space between two columns that have the same x-axis value
+	columnLeftPadding: 0,
 	axisBarGap: 5, //the horizontal space between a vertical axis and an adjacent bar
 	maxColumnWidth: 7.5, // the maximum width of a column as a percent of the available chart width	primaryAxisPosition: "right", // the first axis will be rendered on this side, "right" or "left" only
 	primaryAxisPosition: "right", // the first axis will be rendered on this side, "right" or "left" only
@@ -317,6 +318,7 @@ function Gneiss(config)
 	var columnWidth;
 	var columnGroupWidth;
 	var columnGroupShift;
+	var columnLeftPadding;
 
 	this.containerId = function Gneiss$containerId(elem) {
 		if (!arguments.length) {
@@ -521,6 +523,12 @@ function Gneiss(config)
 		columnGroupShift = w;
 	};
 
+	this.columnLeftPadding = function Gneiss$columnLeftPadding(w) {
+		if (!arguments.length) {
+			return columnLeftPadding;
+		}
+		columnLeftPadding = w;
+	};
 
 	this.lineDotsThreshold = function Gneiss$lineDotsThreshold(n) {
 		if (!arguments.length) {
@@ -1109,6 +1117,7 @@ function Gneiss(config)
 
 					axisItem.line = d3.select(this).select("line")
 						.attr("x2", -620)
+						.attr("x1", -17)
 						.attr("stroke","#D5D9DC")
 						//former dasharray
 
@@ -1574,6 +1583,7 @@ function Gneiss(config)
 		g.columnWidth(columnWidth);
 		g.columnGroupWidth((columnWidth + g.columnGap()) * numColumnSeries);
 		g.columnGroupShift(columnWidth + g.columnGap());
+		g.columnLeftPadding(config.columnLeftPadding);
 
 		return this;
 	};
@@ -1601,6 +1611,7 @@ function Gneiss(config)
 
 		var columnWidth = g.columnWidth();
 		var columnGroupShift = g.columnGroupShift();
+		var columnLeftPadding = g.columnLeftPadding();
 
 		var lineSeries;
 
@@ -1627,7 +1638,7 @@ function Gneiss(config)
 					.append("g")
 						.attr("class","seriesColumn seriesGroup")
 						.attr("fill",function(d,i){return d.color? d.color : colors[i+sbt.line.length]})
-						.attr("transform",function(d,i){return "translate("+(i*columnGroupShift - (columnGroupShift * (sbt.column.length-1)/2))+",0)"})
+						.attr("transform",function(d,i){return "translate("+(i*columnGroupShift - (columnGroupShift * (sbt.column.length-1)/2) + columnLeftPadding)+",0)"})
 
 				columnGroups.selectAll("rect")
 					.data(function(d,i){return d.data})
@@ -2178,3 +2189,4 @@ function Gneiss(config)
   // Call build() when someone attempts to construct a new Gneiss object
   return this.build(config);
 }
+

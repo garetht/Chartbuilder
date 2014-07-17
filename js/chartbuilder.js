@@ -9,18 +9,13 @@ ChartBuilder = {
 	curRaw: "",
 	advancedMode: false,
 	separators: {},
-	getNewData: function(csv) {
-		var i;
-		if(!csv) {
-			return null;
-		}
-
+	parser: function(csv, delimiter) {
 		// Split the csv information by lines
 		var csv_array = csv.split("\n");
 
 		// Split the first element of the array by the designated separator, tab in this case
 		var csv_matrix = [];
-		var delim = String.fromCharCode(9);
+		var delim = delimiter || String.fromCharCode(9);
 
 		if (delim == this.separators.thousands || delim == this.separators.decimal) {
 			console.warn("Your text deliminator is the same as your locale's thousands separator or decimal separator")
@@ -73,8 +68,15 @@ ChartBuilder = {
 		if(rows_num < 2) {
 			return null;
 		}
+	},
+	getNewData: function(csv) {
+		var i;
+		if(!csv) {
+			return null;
+		}
 
-		return csv_matrix;
+		var parser = window.Papa && window.Papa.parse ? Papa.parse : this.parser;
+		return parser(csv);
 	},
 	// Given the matrix containing the well formated csv, create the object that
 	// is going to be used later
@@ -440,10 +442,7 @@ ChartBuilder = {
 				<select class="typePicker" id="'+this.idSafe(s.name)+'_type">\
 					<option '+(s.type=="line"?"selected":"")+' value="line">Line</option>\
 					<option '+(s.type=="column"?"selected":"")+' value="column">Column</option>\
-					<option '+(s.type=="bargrid"?"selected":"")+' '+(g.xAxis().type == "date"?"disabled":"")+' value="bargrid">Bar Grid</option>\
-					<option '+(s.type=="scatter"?"selected":"")+' value="scatter">Scatter</option>\
 				</select>\
-				<input id="'+this.idSafe(s.name)+'_check" name="'+this.idSafe(s.name)+'_check" type="checkbox" />\
 				<div class="clearfix"></div>\
 			</div>');
 			var color = s.color ? s.color.replace("#","") : colors[i].replace("#","");
