@@ -23,6 +23,9 @@ Date.setLocale('en');
 Gneiss.defaultGneissChartConfig = {
 	container: "#chartContainer", //css id of target chart container
 	editable: true, // reserved for enabling or dissabling on chart editing
+	definitions: function(defs) {
+		// Used to set up SVG definitions
+	},
 	lineDotsThreshold: 15, //line charts will have dots on points until a series has this number of points
 	dotRadius: 4, //the radius of dots used on line and scatter plots
 	dotStructure: function(group) {
@@ -85,6 +88,9 @@ Gneiss.defaultGneissChartConfig = {
 			color: null
 		}
 	],
+	yAxisStructure: function() {
+
+	},
 	series: [
 		{
 			name: "apples",
@@ -324,6 +330,13 @@ function Gneiss(config)
 			return containerElement;
 		}
 		containerElement = elem;
+	};
+
+	this.definitions = function Gneiss$definitions(elem) {
+		if (!arguments.length) {
+			return definitions;
+		}
+		definitions = elem;
 	};
 
 	this.footerElement = function Gneiss$footerElement(elem) {
@@ -660,6 +673,7 @@ function Gneiss(config)
 		// Deep copy the config data to prevent side effects
 		g.containerId(config.container.slice());
 		g.containerElement( $(g.containerId() ));
+		g.definitions(config.definitions);
 		g.title(config.title.slice());
 		g.subtitle(config.subtitle.slice());
 		g.secondaryTitle(config.secondaryTitle.slice());
@@ -701,6 +715,10 @@ function Gneiss(config)
 
 		g.width(g.containerElement().width()); //save the width in pixels
 		g.height(g.containerElement().height()); //save the height in pixels
+
+		var defs = g.chartElement().append("defs"),
+				customDefinitions = g.definitions().bind(g);
+		customDefinitions(defs);
 
 		//add rect, use as a background to prevent transparency
 		g.chartElement().append("rect")
@@ -997,7 +1015,7 @@ function Gneiss(config)
 
 			g.yAxis()[i].area
 			.y0(function() {
-				return 500;
+				return g.height() - g.padding().bottom;
 			})
 			.y1(function(d, j) {
 				return d || d === 0 ? g.yAxis()[yAxisIndex].scale(d) : null;
