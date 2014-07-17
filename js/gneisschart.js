@@ -1113,7 +1113,6 @@ function Gneiss(config)
 
 					var groups = axisGroup.selectAll("g").length - 1;
 					//store the line element of the axisItem
-					console.log()
 					axisItem.line = d3.select(this).select("line")
 						.attr("x2", -620)
 						.attr("x1", -11 + g.columnLeftPadding())
@@ -1427,9 +1426,6 @@ function Gneiss(config)
 					else if (hours > 1){
 						hourGap = 1;
 					}
-
-					console.log(hours, hourGap);
-
 
 					switch(g.xAxis().formatter) {
 						case "yy":
@@ -1941,6 +1937,7 @@ function Gneiss(config)
 						.attr("class","seriesLine")
 						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
 
+				g.seriesContainer.selectAll("path.graph-area").remove()
 				var lineArea = g.seriesContainer.selectAll("path.graph-area")
 					 							.data(sbt.line)
 
@@ -1955,7 +1952,7 @@ function Gneiss(config)
 					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0";
 					 })
 					 .attr("fill", function(d, j) {
-					 	 return "url(" + (d.color ? d.color : colors[j]) + "-gradient)";
+					 	 return "url(" + (d.color ? d.color : colors[j]).toUpperCase() + "-gradient)";
 					 })
 
 				lineSeries.transition()
