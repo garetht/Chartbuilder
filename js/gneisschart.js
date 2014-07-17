@@ -1055,8 +1055,14 @@ function Gneiss(config)
 					.tickValues(g.yAxis()[i].tickValues?curAxis.tickValues:Gneiss.helper.exactTicks(curAxis.scale.domain(),g.yAxis()[0].ticks))
 
 				//append axis container
+				var axisSet = g.chartElement().append("g");
 
-				axisGroup = g.chartElement().append("g")
+				// HACK: hardcoded left axis
+				axisSet.append("path")
+							 .attr("class", "yAxis-line")
+							 .attr("d", "M-615,118.5 V 510")
+
+				axisGroup = axisSet
 					.attr("class","axis yAxis")
 					.attr("id",i == 0 ? "leftAxis" : "rightAxis" )
 					.attr("transform",i == 0 ? "translate("+( g.width()-g.padding().right)+",0)" : "translate("+g.padding().left+",0)" )
@@ -1075,9 +1081,10 @@ function Gneiss(config)
 			//adjust label position and add prefix and suffix
 			var topAxisLabel, minY = Infinity;
 
-			this.customYAxisFormat(axisGroup, i);
+			// This was probably an aborted refactor
+			// this.customYAxisFormat(axisGroup, i);
 
-
+			// Actual
 			axisGroup
 				.selectAll("g")
 				.each(function(d,j) {
@@ -1101,8 +1108,9 @@ function Gneiss(config)
 					//store the line element of the axisItem
 
 					axisItem.line = d3.select(this).select("line")
+						.attr("x2", -620)
 						.attr("stroke","#D5D9DC")
-						// former dasharray
+						//former dasharray
 
 					//apply the prefix as appropriate
 					switch(curAxis.prefix.use) {
@@ -1159,8 +1167,7 @@ function Gneiss(config)
 					// Some shifting
 					axisItem.text
 									.attr("class", "label-text")
-									.attr("transform", "translate(-10, 8)")
-									.attr("")
+									.attr("transform", "translate(-10, 1)")
 
 					//find the top most axisItem
 					//store its text element
@@ -1213,7 +1220,7 @@ function Gneiss(config)
 
 		try{
 			//the title will always be the same distance from the top, and will always be the top most element
-			// Our title element is independent of the graph, and is placed in the padding
+			// The SeatGeek title element is independent of the graph, and is placed in the padding
 			g.titleElement().attr("y",g.defaultPadding().top / 2 - 20);
 		}catch(e){/* There isn't a title element and I dont care to let you know */}
 
@@ -1633,8 +1640,8 @@ function Gneiss(config)
 							})
 						.attr("y",function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)})
 
-				var lsd = lineSeries.data(sbt.line)
-				lsd.enter()
+				var lineSeriesData = lineSeries.data(sbt.line)
+				lineSeriesData.enter()
 					.append("path")
 						.attr("d",function(d,j) {
 							yAxisIndex = d.axis;
@@ -1644,9 +1651,12 @@ function Gneiss(config)
 						.attr("class","seriesLine seriesGroup")
 						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
 
-				lsd.enter()
+				lineSeriesData.enter()
 					 .append("path")
-					 .attr("class", "graph-area")
+					 .attr("class", function(d, i) {
+					 	console.log(d, i)
+					 		return "graph-area";
+					 })
 					 .attr("d", function(d, j) {
 					 		var pathString = g.yAxis()[d.axis].area(d.data);
 					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0"
@@ -1918,7 +1928,10 @@ function Gneiss(config)
 				lineArea
 					 .enter()
 					 .append("path")
-					 .attr("class", "graph-area")
+					 .attr("class", function(d, i) {
+					 	console.log(d, i)
+					 	return "graph-area";
+					 })
 					 .attr("d", function(d, j) {
 					 		var pathString = g.yAxis()[d.axis].area(d.data);
 					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0";
