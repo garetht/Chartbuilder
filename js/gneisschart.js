@@ -1894,7 +1894,7 @@ function Gneiss(config)
 						.attr("class","seriesLine")
 						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
 
-				var lineArea = g.seriesContainer.selectAll("path.main-path")
+				var lineArea = g.seriesContainer.selectAll("path.graph-area")
 					 							.data(sbt.line)
 
 				lineArea
@@ -1903,12 +1903,19 @@ function Gneiss(config)
 					 .attr("class", "graph-area")
 					 .attr("d", function(d, j) {
 					 		var pathString = g.yAxis()[d.axis].area(d.data);
-					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0"
+					 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0";
 					 })
 
 				lineSeries.transition()
 					.duration(500)
 					.attr("d",function(d,j) { yAxisIndex = d.axis; pathString = g.yAxis()[d.axis].line(d.data).split("L0,0L").join("M0,0M").split("L0,0").join(""); return pathString;})
+
+				lineArea.transition()
+								.duration(500)
+								 .attr("d", function(d, j) {
+								 		var pathString = g.yAxis()[d.axis].area(d.data);
+								 		return pathString.indexOf("NaN") === -1 ? pathString : "M0,0";
+								 })
 
 				lineSeries.exit().remove()
 				lineArea.exit().remove()
