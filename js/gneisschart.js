@@ -35,6 +35,25 @@ Gneiss.defaultGneissChartConfig = {
 	},
 	bargridLabelMargin: 4, //the horizontal space between a bargrid bar and it's label
 	bargridBarThickness: 20, //thickness of the bars in a bargrid
+	columnStructure: function(group) {
+		var that = this;
+		var columnGroup = group.append("g")
+													 .attr("class", "column-group");
+
+		columnGroup.append("rect")
+				 .attr("width", that.columnWidth())
+				 .attr("height", function(d, i) {
+					 yAxisIndex = d3.select(this.parentNode.parentNode).data()[0].axis;
+					 return Math.abs(that.yAxis()[yAxisIndex].scale(d)-that.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,that.yAxis()[yAxisIndex].scale.domain())))
+				 })
+				 .attr("x", function(d,i) {
+					 return that.xAxis().scale(that.xAxisRef()[0].data[i])  - that.columnWidth()/2
+				 })
+				 .attr("y",function(d,i) {
+				  	yAxisIndex = d3.select(this.parentNode.parentNode).data()[0].axis;
+						return (that.yAxis()[yAxisIndex].scale(d)-that.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,that.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? that.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,that.yAxis()[yAxisIndex].scale.domain())) : that.yAxis()[yAxisIndex].scale(d)
+				})
+	},
 	xAxisMargin: 8, //the vertical space between the plot area and the x axis
 	footerMargin: 4, //the vertical space between the bottom of the bounding box and the meta information
 	legendLabelSpacingX: 5, //the horizontal space between legend items
@@ -90,9 +109,6 @@ Gneiss.defaultGneissChartConfig = {
 			color: null
 		}
 	],
-	yAxisStructure: function() {
-
-	},
 	series: [
 		{
 			name: "apples",
@@ -538,6 +554,13 @@ function Gneiss(config)
 		columnLeftPadding = w;
 	};
 
+	this.columnStructure = function Gneiss$columnStructure(w) {
+		if (!arguments.length) {
+			return columnStructure;
+		}
+		columnStructure = w;
+	};
+
 	this.lineDotsThreshold = function Gneiss$lineDotsThreshold(n) {
 		if (!arguments.length) {
 			return lineDotsThreshold;
@@ -715,6 +738,7 @@ function Gneiss(config)
 		g.legendLabelSpacingX(config.legendLabelSpacingX *1);
 		g.legendLabelSpacingY(config.legendLabelSpacingY * 1);
 		g.columnGap(config.columnGap * 1);
+		g.columnStructure(config.columnStructure);
 		g.maxColumnWidth(config.maxColumnWidth * 1);
 		g.columnLeftPadding(config.columnLeftPadding);
 		g.titleBottomMargin(config.titleBottomMargin * 1);
@@ -1644,23 +1668,30 @@ function Gneiss(config)
 						.attr("fill",function(d,i){return d.color? d.color : colors[i+sbt.line.length]})
 						.attr("transform",function(d,i){return "translate("+(i*columnGroupShift - (columnGroupShift * (sbt.column.length-1)/2))+",0)"})
 
-				// var barIterator = columnGroups.selectAll("g")
-				// 															.data(function(d, i) {
-				// 																return d.data;
-				// 															})
-				// 															.enter();
-				// var barStruct = g.barStructure().bind(g);
+				var barIterator = columnGroups.selectAll("g.bar-iterator")
+																			.data(function(d, i) {
+																				return d.data;
+																			})
+																			.enter();
+				var barStruct = g.columnStructure().bind(g)(barIterator);
 
-				columnGroups.selectAll("rect")
-					.data(function(d,i){return d.data})
-					.enter()
-						.append("rect")
-						.attr("width",columnWidth)
-						.attr("height", function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return Math.abs(g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())))})
-						.attr("x", function(d,i) {
-							return g.xAxis().scale(g.xAxisRef()[0].data[i])  - columnWidth/2
-							})
-						.attr("y",function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)})
+				// columnGroups.selectAll("rect")
+				// 	.data(function(d,i){return d.data})
+				// 	.enter()
+				// 		.append("rect")
+				// 		.attr("width",columnWidth)
+				// 		.attr("height", function(d, i) {
+				// 			yAxisIndex = d3.select(this.parentNode).data()[0].axis;
+				// 			return Math.abs(g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())))
+				// 		})
+				// 		.attr("x", function(d,i) {
+				// 			return g.xAxis().scale(g.xAxisRef()[0].data[i])  - columnWidth/2
+				// 			})
+				// 		.attr("y",function(d,i) {
+				// 			yAxisIndex = d3.select(this.parentNode).data()[0].axis;
+				// 			return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)
+				// 		})
+
 				var lineSeriesData = lineSeries.data(sbt.line)
 				lineSeriesData.enter()
 					.append("path")
@@ -1926,25 +1957,18 @@ function Gneiss(config)
 					.duration(500)
 					.attr("transform",function(d,i){return "translate("+(i*columnGroupShift - (columnGroupShift * (sbt.column.length-1)/2))+",0)"})
 
+				d3.selectAll(".column-group").remove()
+
+				var rectIterator = columnGroups.selectAll("g.bar-iterator")
+																			 .data(function(d, i) {
+																			 	return d.data;
+																			 });
+				var enteredRectIterator = rectIterator.enter();
+
+				g.columnStructure().bind(g)(enteredRectIterator);
+
 				columnGroups.exit().remove()
-
-				columnRects = columnGroups.selectAll("rect")
-					.data(function(d,i){return d.data})
-
-				columnRects.enter()
-						.append("rect")
-
-				columnRects.transition()
-					.duration(500)
-					.attr("width",columnWidth)
-					.attr("height", function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return Math.abs(g.yAxis()[yAxisIndex].scale(d) - g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())))})
-					.attr("x",g.xAxis().type =="date" ?
-							function(d,i) {return g.xAxis().scale(g.xAxisRef()[0].data[i])  - columnWidth/2}:
-							function(d,i) {return g.xAxis().scale(i) - columnWidth/2}
-					)
-					.attr("y",function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)})
-
-				columnRects.exit().remove()
+				rectIterator.exit().remove()
 
 				//add lines
 				lineSeries = g.seriesContainer.selectAll("path.seriesLine")
