@@ -1661,7 +1661,6 @@ function Gneiss(config)
 							return g.xAxis().scale(g.xAxisRef()[0].data[i])  - columnWidth/2
 							})
 						.attr("y",function(d,i) {yAxisIndex = d3.select(this.parentNode).data()[0].axis; return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)})
-
 				var lineSeriesData = lineSeries.data(sbt.line)
 				lineSeriesData.enter()
 					.append("path")
@@ -1954,7 +1953,7 @@ function Gneiss(config)
 						if (g.theme() === "light") {
 							return d.color? d.color : colors[i]
 						} else {
-							return "url(#" + colors[i + 4] + "-gradient)";
+							return "url(" + colors[i + 4] + "-gradient)";
 						}
 					});
 
