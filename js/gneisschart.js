@@ -26,6 +26,7 @@ Gneiss.defaultGneissChartConfig = {
 	definitions: function(defs) {
 		// Used to set up SVG definitions
 	},
+	theme: "light",
 	lineDotsThreshold: 15, //line charts will have dots on points until a series has this number of points
 	dotRadius: 4, //the radius of dots used on line and scatter plots
 	dotStructure: function(group) {
@@ -332,6 +333,13 @@ function Gneiss(config)
 			return containerElement;
 		}
 		containerElement = elem;
+	};
+
+	this.theme = function Gneiss$theme(w) {
+		if (!arguments.length) {
+			return theme;
+		}
+		theme = w;
 	};
 
 	this.definitions = function Gneiss$definitions(elem) {
@@ -681,6 +689,7 @@ function Gneiss(config)
 		// Deep copy the config data to prevent side effects
 		g.containerId(config.container.slice());
 		g.containerElement( $(g.containerId() ));
+		g.theme(config.theme);
 		g.definitions(config.definitions);
 		g.title(config.title.slice());
 		g.subtitle(config.subtitle.slice());
@@ -1662,7 +1671,14 @@ function Gneiss(config)
 							return pathString.indexOf("NaN")==-1?pathString:"M0,0"
 						})
 						.attr("class","seriesLine seriesGroup")
-						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
+						.attr("stroke",function(d,i){
+							if (g.theme() === "light") {
+								return d.color? d.color : colors[i]
+							} else {
+								console.log("here 3")
+								return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+							}
+						})
 
 				lineSeriesData.enter()
 					 .append("path")
@@ -1681,7 +1697,14 @@ function Gneiss(config)
 					.enter()
 					.append("g")
 					.attr("class","lineSeriesDots seriesGroup")
-					.attr("fill", function(d,i){return d.color? d.color : colors[i]})
+					.attr("fill", function(d,i){
+						if (g.theme() === "light") {
+							return d.color? d.color : colors[i]
+						} else {
+							console.log("here 13")
+							return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+						}
+					})
 
 				var lineSeriesDotGroupsContainer = lineSeriesDotGroups
 					.filter(function(d){return d.data.length < g.lineDotsThreshold()})
@@ -1929,13 +1952,27 @@ function Gneiss(config)
 				//add lines
 				lineSeries = g.seriesContainer.selectAll("path.seriesLine")
 					.data(sbt.line)
-					.attr("stroke",function(d,i){return d.color? d.color : colors[i]});
+					.attr("stroke",function(d,i){
+						if (g.theme() === "light") {
+							return d.color? d.color : colors[i]
+						} else {
+							console.log("here 31")
+							return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+						}
+					});
 
 				lineSeries.enter()
 						.append("path")
 						.attr("d",function(d,j) { yAxisIndex = d.axis; pathString = g.yAxis()[d.axis].line(d.data).split("L0,0L").join("M0,0M").split("L0,0").join(""); return pathString;})
 						.attr("class","seriesLine")
-						.attr("stroke",function(d,i){return d.color? d.color : colors[i]})
+						.attr("stroke",function(d,i){
+							if (g.theme() === "light") {
+								return d.color? d.color : colors[i]
+							} else {
+								console.log("here 49")
+								return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+							}
+						})
 
 				g.seriesContainer.selectAll("path.graph-area").remove()
 				var lineArea = g.seriesContainer.selectAll("path.graph-area")
