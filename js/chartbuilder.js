@@ -782,7 +782,7 @@ ChartBuilder = {
 // Create default config for chartbuilder
 ChartBuilder.getDefaultConfig = function() {
   var chartConfig = {};
-  chartConfig.colors = ["#0066C3", "#639D07", "#F02629", "#FF641F","#A63869","#882551","#6B133A","#4D0022",
+  chartConfig.colors = ["#0066C3", "#639D07", "#F02629", "#FF641F","#40A2EA", "#639D07", "#FC3838", "#F3BE27",
 						"#BF600A","#FFC07E","#E1A76A","#C48D55","#A67341","#885A2D","#6B4118","#4D2704",
 						"#BFAA00","#FFF270","#E1D55D","#C4B84B","#A69C38","#887F25","#6B6213","#4D4500",
 						"#00BFA5","#70FFF7","#5DE1D9","#4BC4BC","#38A69E","#258880","#136B63","#004D45",
@@ -998,6 +998,15 @@ ChartBuilder.start = function(config) {
 		//if the selected option has two words set it as the number of ticks
 		//else set ticks to null
 		chart.xAxis().ticks = val.length > 1 ? val : null;
+		ChartBuilder.redraw();
+		ChartBuilder.inlineAllStyles();
+	});
+
+	$("#chart-theme").change(function() {
+		var val = $(this).val().toLowerCase();
+		$("#seriesContainer").empty();
+		$("#interactiveContent").attr("class", val + "-theme");
+		chart.theme(val);
 		ChartBuilder.redraw();
 		ChartBuilder.inlineAllStyles();
 	});

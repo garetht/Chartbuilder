@@ -1675,8 +1675,7 @@ function Gneiss(config)
 							if (g.theme() === "light") {
 								return d.color? d.color : colors[i]
 							} else {
-								console.log("here 3")
-								return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+								return "url(#" + colors[i + 4] + "-gradient)";
 							}
 						})
 
@@ -1701,8 +1700,7 @@ function Gneiss(config)
 						if (g.theme() === "light") {
 							return d.color? d.color : colors[i]
 						} else {
-							console.log("here 13")
-							return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+							return "url(#" + colors[i + 4] + "-gradient)";
 						}
 					})
 
@@ -1956,8 +1954,7 @@ function Gneiss(config)
 						if (g.theme() === "light") {
 							return d.color? d.color : colors[i]
 						} else {
-							console.log("here 31")
-							return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+							return "url(#" + colors[i + 4] + "-gradient)";
 						}
 					});
 
@@ -1969,8 +1966,7 @@ function Gneiss(config)
 							if (g.theme() === "light") {
 								return d.color? d.color : colors[i]
 							} else {
-								console.log("here 49")
-								return "url(#" + d.color ? d.color : colors[i + 4] + "-gradient)";
+								return "url(" + colors[i + 4] + "-gradient)";
 							}
 						})
 
@@ -2017,6 +2013,13 @@ function Gneiss(config)
 					.append("g")
 					.attr("class","lineSeriesDots")
 					.attr("fill", function(d,i){return d.color? d.color : colors[i]})
+					.attr("stroke", function(d,i){
+						if (g.theme() === "light") {
+							return d.color? d.color : colors[i]
+						} else {
+							return colors[i + 4];
+						}
+					})
 
 				lineSeriesDotGroups.exit().remove()
 
