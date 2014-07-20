@@ -1673,24 +1673,8 @@ function Gneiss(config)
 																				return d.data;
 																			})
 																			.enter();
-				var barStruct = g.columnStructure().bind(g)(barIterator);
 
-				// columnGroups.selectAll("rect")
-				// 	.data(function(d,i){return d.data})
-				// 	.enter()
-				// 		.append("rect")
-				// 		.attr("width",columnWidth)
-				// 		.attr("height", function(d, i) {
-				// 			yAxisIndex = d3.select(this.parentNode).data()[0].axis;
-				// 			return Math.abs(g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())))
-				// 		})
-				// 		.attr("x", function(d,i) {
-				// 			return g.xAxis().scale(g.xAxisRef()[0].data[i])  - columnWidth/2
-				// 			})
-				// 		.attr("y",function(d,i) {
-				// 			yAxisIndex = d3.select(this.parentNode).data()[0].axis;
-				// 			return (g.yAxis()[yAxisIndex].scale(d)-g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain()))) >= 0 ? g.yAxis()[yAxisIndex].scale(Gneiss.helper.columnXandHeight(d,g.yAxis()[yAxisIndex].scale.domain())) : g.yAxis()[yAxisIndex].scale(d)
-				// 		})
+				var barStruct = g.columnStructure().bind(g)(barIterator);
 
 				var lineSeriesData = lineSeries.data(sbt.line)
 				lineSeriesData.enter()
@@ -1969,6 +1953,7 @@ function Gneiss(config)
 
 				columnGroups.exit().remove()
 				rectIterator.exit().remove()
+				g.seriesContainer.selectAll("path.seriesLine").remove()
 
 				//add lines
 				lineSeries = g.seriesContainer.selectAll("path.seriesLine")
@@ -1981,6 +1966,7 @@ function Gneiss(config)
 						}
 					});
 
+
 				lineSeries.enter()
 						.append("path")
 						.attr("d",function(d,j) { yAxisIndex = d.axis; pathString = g.yAxis()[d.axis].line(d.data).split("L0,0L").join("M0,0M").split("L0,0").join(""); return pathString;})
@@ -1989,10 +1975,11 @@ function Gneiss(config)
 							if (g.theme() === "light") {
 								return d.color? d.color : colors[i]
 							} else {
-								return "url(" + colors[i + 4] + "-gradient)";
+								var colorIndex = colors.indexOf(d.color.toUpperCase());
+								var color = colorIndex < 4 ? colors[colorIndex + 4] : d.color;
+								return "url(" + color + "-gradient)";
 							}
 						})
-
 				g.seriesContainer.selectAll("path.graph-area").remove()
 				var lineArea = g.seriesContainer.selectAll("path.graph-area")
 					 							.data(sbt.line)
@@ -2040,7 +2027,9 @@ function Gneiss(config)
 						if (g.theme() === "light") {
 							return d.color? d.color : colors[i]
 						} else {
-							return colors[i + 4];
+							var colorIndex = colors.indexOf(d.color.toUpperCase());
+							var color = colorIndex < 4 ? colors[colorIndex + 4] : d.color;
+							return color;
 						}
 					})
 
