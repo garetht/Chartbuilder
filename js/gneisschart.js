@@ -1975,7 +1975,7 @@ function Gneiss(config)
 							if (g.theme() === "light") {
 								return d.color? d.color : colors[i]
 							} else {
-								var colorIndex = colors.indexOf(d.color.toUpperCase());
+								var colorIndex = d.color ? colors.indexOf(d.color.toUpperCase()) : i;
 								var color = colorIndex < 4 ? colors[colorIndex + 4] : d.color;
 								return "url(" + color + "-gradient)";
 							}
@@ -2027,7 +2027,7 @@ function Gneiss(config)
 						if (g.theme() === "light") {
 							return d.color? d.color : colors[i]
 						} else {
-							var colorIndex = colors.indexOf(d.color.toUpperCase());
+							var colorIndex = d.color ? colors.indexOf(d.color.toUpperCase()) : i;
 							var color = colorIndex < 4 ? colors[colorIndex + 4] : d.color;
 							return color;
 						}
