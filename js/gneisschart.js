@@ -57,7 +57,8 @@ Gneiss.defaultGneissChartConfig = {
 	xAxisMargin: 8, //the vertical space between the plot area and the x axis
 	footerMargin: 4, //the vertical space between the bottom of the bounding box and the meta information
 	legendLabelSpacingX: 5, //the horizontal space between legend items
-	legendLabelSpacingY: 4, //the vertical space between legend items
+	legendLabelSpacingY: 4, //the vertical space between legend items,
+	rotatedLabel: false,
 	columnGap: 1, //the horizontal space between two columns that have the same x-axis value
 	columnLeftPadding: 0,
 	axisBarGap: 5, //the horizontal space between a vertical axis and an adjacent bar
@@ -324,6 +325,7 @@ function Gneiss(config)
 	var primaryAxisPosition;
 	var legendLabelSpacingX;
 	var legendLabelSpacingY;
+	var rotatedLabel;
 	var columnGap;
 	var maxColumnWidth;
 	var titleBottomMargin;
@@ -631,6 +633,13 @@ function Gneiss(config)
 			legendLabelSpacingY = n;
 	};
 
+	this.rotatedLabel = function Gneiss$rotatedLabel(c) {
+		if (!arguments.length) {
+			return rotatedLabel;
+		}
+		rotatedLabel = c;
+	};
+
 	this.columnGap = function Gneiss$columnGap(n) {
 		if (!arguments.length) {
 			return columnGap;
@@ -737,6 +746,7 @@ function Gneiss(config)
 		g.primaryAxisPosition(config.primaryAxisPosition.slice());
 		g.legendLabelSpacingX(config.legendLabelSpacingX *1);
 		g.legendLabelSpacingY(config.legendLabelSpacingY * 1);
+		g.rotatedLabel(config.rotatedLabel);
 		g.columnGap(config.columnGap * 1);
 		g.columnStructure(config.columnStructure);
 		g.maxColumnWidth(config.maxColumnWidth * 1);
@@ -1546,6 +1556,17 @@ function Gneiss(config)
 					else if (attrx - pwidth < 0) {
 						this.setAttribute("text-anchor","start")
 					}
+
+					if (g.rotatedLabel()) {
+						var bb = this.getBBox();
+						var translate = '(' + (bb.height - 2)  + ',' + (-(bb.width / 2) - 10) + ')';
+						this.setAttribute("transform", "translate" + translate + "rotate(90)")
+						this.setAttribute("x", 0);
+						this.setAttribute("text-anchor","middle");
+					} else {
+						this.setAttribute("transform", "")
+					}
+
 					g.padding().left = g.defaultPadding().left
 				}
 				else {
@@ -1644,8 +1665,8 @@ function Gneiss(config)
 
 		if(first) {
 
-			//create a group to contain series
-			g.seriesContainer = g.chartElement().append("g")
+			// Create a group to contain series
+			g.seriesContainer = g.chartElement().insert("g", '#xAxis')
 				.attr("id","seriesContainer")
 				.attr("transform", "translate(" + g.columnLeftPadding() + ",0)");
 
@@ -2241,7 +2262,6 @@ function Gneiss(config)
 			.setXAxis()
 			.drawSeriesAndLegend()
 			.updateMetaAndTitle();
-
 
 		return this;
 	};

@@ -863,6 +863,11 @@ ChartBuilder.start = function(config) {
 	// add interactions to chartbuilder interface
 	//
 	*/
+	$("#chartLabelRotate").change(function(e) {
+		console.log($(this).is(':checked'))
+		chart.rotatedLabel($(this).is(':checked'));
+		ChartBuilder.redraw();
+	})
 
 	$("#csvInput").keyup(function() {
 		//check if the data is different
