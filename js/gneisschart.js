@@ -1559,10 +1559,16 @@ function Gneiss(config)
 
 					if (g.rotatedLabel()) {
 						var bb = this.getBBox();
-						var translate = '(' + (bb.height - 2)  + ',' + (-(bb.width / 2) - 10) + ')';
-						this.setAttribute("transform", "translate" + translate + "rotate(90)")
+
+						var baseX = 0,
+						    baseY = -10;
+						var hypotenuseX = baseX - bb.width,
+						    hypotenuseY = baseY + bb.width / 1.5;
+						var translate = 'translate(' + hypotenuseX  + ',' + hypotenuseY + ')';
+
+						this.setAttribute("transform", translate + " rotate(-45)")
 						this.setAttribute("x", 0);
-						this.setAttribute("text-anchor","middle");
+						this.setAttribute("text-anchor","left");
 					} else {
 						this.setAttribute("transform", "")
 					}
@@ -1575,7 +1581,6 @@ function Gneiss(config)
 						g.padding().left = pwidth + g.defaultPadding().left;
 						g.redraw() //CHANGE (maybe)
 					}
-
 				}
 			});
 
