@@ -80,7 +80,7 @@ Gneiss.defaultGneissChartConfig = {
   colors: ["#ff4cf4","#ffb3ff","#e69ce6","#cc87cc","#b373b3","#995f99","#804c80","#665266","#158eff","#99cdff","#9cc2e6","#87abcc","#7394b3","#5f7d99","#466780","#525c66"],
   padding :{
     top: 5,
-    bottom: 50,
+    bottom: 70,
     left: 10,
     right: 10
   },
@@ -1110,7 +1110,7 @@ function Gneiss(config)
         // HACK: hardcoded left axis
         axisSet.append("path")
                .attr("class", "yAxis-line")
-               .attr("d", "M-615,118.5 V 510")
+               .attr("d", "M-615,118.5 V 580")
 
         axisGroup = axisSet
           .attr("class","axis yAxis")
@@ -1544,18 +1544,53 @@ function Gneiss(config)
       //.attr("text-anchor", g.isBargrid ? "end":"middle")
       .each(function() {
         var pwidth = this.parentNode.getBoundingClientRect().width
+
+        var textNode = d3.select(this),
+            labelText = textNode.text(),
+            words = labelText.split(/\s+/).reverse(),
+            line = [],
+            lineNumber = 0,
+            lineHeight = 13,
+            range = g.xAxis().scale.range(),
+            width = range[1] - range[0] - 20;
+
+        textNode.attr("transform", "translate(-10, 0)");
+
+        var currentSpan = textNode.text(null).append('tspan')
+                                  .attr('dy', 0)
+                                  .attr('x', 0);
+
+        while (words.length > 0) {
+          var word = words.pop();
+          line.push(word);
+          currentSpan.text(line.join(' '));
+          if (currentSpan.node().getComputedTextLength() >= width) {
+            if (line.length === 1) {
+              currentSpan.text(line.join(' '));
+              line = []
+            } else {
+              line.pop();
+              currentSpan.text(line.join(' '));
+              line = [word];
+            }
+            currentSpan = textNode.append('tspan')
+                                  .attr('dy', lineHeight)
+                                  .attr('x', 0)
+          }
+        }
+
         var attr = this.parentNode.getAttribute("transform")
         var attrx = Number(attr.split("(")[1].split(",")[0])
         var attry = Number(attr.split(")")[0].split(",")[1])
         if(!g.isBargrid()) {
           // fix labels to not fall off edge when not bargrid
-          if (pwidth + attrx >  g.width()) {
-            this.setAttribute("x",Number(this.getAttribute("x"))-(pwidth + attrx -  g.width() + g.padding().right))
-            this.setAttribute("text-anchor","start")
-          }
-          else if (attrx - pwidth < 0) {
-            this.setAttribute("text-anchor","start")
-          }
+          // if (pwidth + attrx >  g.width()) {
+          //   this.setAttribute("dx",Number(this.getAttribute("x"))-(pwidth + attrx -  g.width() + g.padding().right - 10))
+          //   this.setAttribute("text-anchor","start")
+          // }
+          // else if (attrx - pwidth < 0) {
+          //   this.setAttribute("text-anchor","start")
+          // }
 
           if (g.rotatedLabel()) {
             var bb = this.getBBox();
@@ -1564,7 +1599,6 @@ function Gneiss(config)
                 baseY = -10;
             var hypotenuseX = baseX - bb.width,
                 hypotenuseY = baseY + bb.width / 1.5;
-            console.log(hypotenuseX, hypotenuseY);
             var translate = 'translate(' + hypotenuseX  + ',' + hypotenuseY + ')';
 
             this.setAttribute("transform", translate + " rotate(-45)")
@@ -1584,8 +1618,6 @@ function Gneiss(config)
           }
         }
       });
-
-
 
     return this;
   };
