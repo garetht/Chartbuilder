@@ -9,6 +9,10 @@ ChartBuilder = {
 	curRaw: "",
 	advancedMode: false,
 	separators: {},
+	graphLabels: {
+		prefix: '$',
+		suffix: ''
+	},
 	parser: function(csv, delimiter) {
 		// Split the csv information by lines
 		var csv_array = csv.split("\n");
@@ -494,7 +498,7 @@ ChartBuilder = {
 				chart.setXScales()
 					.resize();
 				ChartBuilder.redraw();
-
+				toggleLabelHide($("#graphLabelHide").is(':checked'));
 			});
 
 			axer.change(function() {
@@ -718,6 +722,15 @@ ChartBuilder = {
 		return {decimal: l.substring(5,6), thousands: l.substring(1,2)};
 	},
 	actions: {
+		label_prefix_change: function(id, value) {
+			if (id.match('prefix')) {
+				ChartBuilder.graphLabels.prefix = value;
+			} else if (id.match('suffix')) {
+				ChartBuilder.graphLabels.suffix = value;
+			}
+			ChartBuilder.redraw();
+			ChartBuilder.inlineAllStyles();
+		},
 		axis_prefix_change: function(index,that) {
 			chart.yAxis()[index].prefix.value = $(that).val();
 			ChartBuilder.redraw();
@@ -863,10 +876,18 @@ ChartBuilder.start = function(config) {
 	// add interactions to chartbuilder interface
 	//
 	*/
+
+	$("#graphLabelHide").change(function(e) {
+		toggleLabelHide($(this).is(':checked'));
+	});
+
 	$("#chartLabelRotate").change(function(e) {
-		console.log($(this).is(':checked'))
 		chart.rotatedLabel($(this).is(':checked'));
 		ChartBuilder.redraw();
+	});
+
+	$("#graph_label_prefix, #graph_label_suffix").keyup(function(e) {
+		ChartBuilder.actions.label_prefix_change(e.target.id, e.target.value);
 	})
 
 	$("#csvInput").keyup(function() {
@@ -1113,3 +1134,8 @@ ChartBuilder.start = function(config) {
 
   });
 };
+
+function toggleLabelHide(hide) {
+	var display = hide ? 'hide' : 'show';
+	$(".data-label > rect, .data-label > polyline, .data-label > text")[display]();
+}
